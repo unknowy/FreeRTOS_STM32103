@@ -81,6 +81,11 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+//调试使用，正式版本禁止使用
+#if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
+ #include <stdint.h>
+ extern volatile uint32_t ulHighFrequencyTimerTicks;
+#endif
 
 #define configUSE_PREEMPTION		1
 #define configUSE_IDLE_HOOK			0
@@ -91,18 +96,17 @@
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 17 * 1024 ) )
 #define configMAX_TASK_NAME_LEN		( 16 )
-#define configUSE_TRACE_FACILITY	0
+#define configUSE_TRACE_FACILITY	1
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
-//#define configGENERATE_RUN_TIME_STATS 1
-//#define configUSE_STATS_FORMATTING_FUNCTIONS 1
-//#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (ulHighFrequencyTimerTicks = 0u1)
-//#define portGET_RUN_TIME_COUNTER_VALUE() 		  ulHighFrequencyTimerTicks
+/* Run time and task stats gathering related definitions. */
+#define configGENERATE_RUN_TIME_STATS                1
+#define configUSE_STATS_FORMATTING_FUNCTIONS         1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()     (ulHighFrequencyTimerTicks = 0ul)
+#define portGET_RUN_TIME_COUNTER_VALUE()             ulHighFrequencyTimerTicks
+//#define portALT_GET_RUN_TIME_COUNTER_VALUE 
 
-//#if defined（_ICCARM_）||defined(_CC_ARM)||defined(_GNUC_)
-//	#include <stdubt.h>
-//	extern volatile uint32_t ulHighFrequencyTimerTicks;
-//#endif
+
 
 	
 /* Co-routine definitions. */
@@ -127,7 +131,7 @@ to exclude the API function. */
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	191 /* equivalent to 0xb0, or priority 11. */
 
-
+#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }	
 /* This is the value being used as per the ST library which permits 16
 priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest

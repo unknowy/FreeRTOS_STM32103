@@ -5,14 +5,14 @@
   ******************************************************************************
   */ 
 	
-#include "stm32f10x.h"
-#include "bsp_led.h"
-#include "usart1.h"
-
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-
+//#include "stm32f10x.h"
+//#include "bsp_led.h"
+//#include "usart1.h"
+//#include "bsp.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
+//#include "queue.h"
+#include "includes.h"
 
 
 static void vTaskTaskUserIF(void *pvParameters);
@@ -30,12 +30,12 @@ static TaskHandle_t xHandleTaskStart = NULL;
 
 int main(void)
 {	
-	//_set_PRIMASK(1);
-	
-	/* LED �˿ڳ�ʼ�� */
-	LED_Init ();	          //��ʼ�� LED
-	USART1_Config();
-	
+
+
+	__set_PRIMASK(1);
+	bsp_Init(); //硬件初始化
+
+	vSetupSysInfoTest();//为了检测系统任务信息，时钟精度要高于系统节拍
 	AppTaskCreate();
 	vTaskStartScheduler();
 	while(1);
@@ -63,24 +63,46 @@ static void vTaskLED(void *pvParameters)
 }
 static void vTaskMsgPro(void *pvParameters)
 {
-	while(1)
-	{
-		macLED3_TOGGLE(); 
-		vTaskDelay(400);
+	uint8_t ucKeyCode;
+	uint8_t pcWriteBuffer[500];
+
+    while(1)
+    {
+		ucKeyCode = Key_Scan(GPIOA,GPIO_Pin_0) ;
+		
+		if (ucKeyCode != KEY_OFF)
+		{
+			switch (ucKeyCode)
+			{
+				/* K1键按下 打印任务执行情况 */
+				case KEY_ON:			 
+					printf("=================================================\r\n");
+					printf("Taskname    state priority  stacksize TaskNum\r\n"); 
+					vTaskList((char *)&pcWriteBuffer);
+					printf("%s\r\n", pcWriteBuffer);
+				
+					printf("\r\nTask name       Run count       Use rate\r\n");
+					vTaskGetRunTimeStats((char *)&pcWriteBuffer);
+					printf("%s\r\n", pcWriteBuffer);
+					break;
+				
+				/* 其他的键值不处理 */
+				default:                     
+					break;
+			}
+		}
+		
+		vTaskDelay(20);
 	}
 }
  static void vTaskStart(void *pvParameters)
 {
 	while(1)
 	{
-		printf("\r\n this is a printf demo \r\n");
 
-		printf("\r\n ��ӭʹ��Ұ��M3ʵ���:) \r\n");
-		
-		USART1_printf(USART1, "\r\n This is a USART1_printf demo \r\n");
 	
 		USART1_printf(USART1, "\r\n ("__DATE__ " - " __TIME__ ") \r\n");
-		vTaskDelay(4000);
+		vTaskDelay(2000);
 	}
 } 
 static void AppTaskCreate(void)

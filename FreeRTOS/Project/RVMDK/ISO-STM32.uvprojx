@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\FWlib\inc;..\..\User;..\..\User\bsp_h;..\..\Libraries\FreeRTOS;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\FWlib\inc;..\..\User\bsp_h;..\..\Libraries\FreeRTOS;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\RVDS\ARM_CM3;..\..\User</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -559,6 +559,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp_c\usart1.c</FilePath>
             </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp_c\key.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -588,6 +593,26 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\User\FreeRTOSConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>SysInfoTest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\SysInfoTest.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_assert.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\stm32f10x_assert.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_tim_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp_c\bsp_tim_pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp_c\bsp.c</FilePath>
             </File>
           </Files>
         </Group>
