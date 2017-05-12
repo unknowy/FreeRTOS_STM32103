@@ -94,7 +94,17 @@
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
+//#define configGENERATE_RUN_TIME_STATS 1
+//#define configUSE_STATS_FORMATTING_FUNCTIONS 1
+//#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (ulHighFrequencyTimerTicks = 0u1)
+//#define portGET_RUN_TIME_COUNTER_VALUE() 		  ulHighFrequencyTimerTicks
 
+//#if defined（_ICCARM_）||defined(_CC_ARM)||defined(_GNUC_)
+//	#include <stdubt.h>
+//	extern volatile uint32_t ulHighFrequencyTimerTicks;
+//#endif
+
+	
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
