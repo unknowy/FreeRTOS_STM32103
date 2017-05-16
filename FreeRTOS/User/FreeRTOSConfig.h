@@ -99,6 +99,8 @@
 #define configUSE_TRACE_FACILITY	1
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
+
+#define configCHECK_FOR_STACK_OVERFLOW   1
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS         1

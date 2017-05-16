@@ -20,6 +20,7 @@ static void vTaskLED(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
 static void AppTaskCreate(void);
+static void Overflowtest(void);
 
 static TaskHandle_t xHandleTaskUserIF = NULL;
 static TaskHandle_t xHandleTaskLED = NULL;
@@ -98,7 +99,7 @@ static void vTaskMsgPro(void *pvParameters)
 			switch (ucKeyCode)
 			{
 				/* K1键按下 打印任务执行情况 */
-				case 0x11:			 
+				case 0x01:			 
 							printf("=================================================\r\n");
 							printf("Taskname    state priority  stacksize TaskNum\r\n"); 
 							vTaskList((char *)&pcWriteBuffer);
@@ -110,27 +111,10 @@ static void vTaskMsgPro(void *pvParameters)
 						
 							USART1_printf(USART1, "\r\n ("__DATE__ " - " __TIME__ ") \r\n");
 					break;
-				case 0x10:			 
-					printf("new task\r\n");
-					if(xHandleTaskLED!=NULL)
-					{
-						vTaskDelete(xHandleTaskLED);
-						xHandleTaskLED=NULL;
 
-					}
-					break;
-				case 0x01:			 
-					printf("delete task\r\n");
-					if(xHandleTaskLED==NULL)
-					{
-						xTaskCreate(vTaskLED,
-									"vTaskLED",
-									512,
-									NULL,
-									2,
-									&xHandleTaskLED
-									);
-					}
+				case 0x10:			 
+					printf("gg overflow\r\n");
+					Overflowtest();
 					break;
 				/* 其他的键值不处理 */
 				default:   
@@ -142,6 +126,20 @@ static void vTaskMsgPro(void *pvParameters)
 		vTaskDelay(200) ;
 	}
 } 
+static void Overflowtest(void)
+{
+	int16_t i;
+	uint8_t buf[2048];
+	for(i=2047;i>=0;i--)
+	{
+		buf[i]=0x55;
+		vTaskDelay(1);
+	}
+}
+void vApplicationStackOverflowHook( TaskHandle_t xTask, signed char *pcTaskName )
+{
+	printf("%s overflow \r\n", pcTaskName);
+}
 static void AppTaskCreate(void)
 {
 	xTaskCreate(vTaskTaskUserIF,
