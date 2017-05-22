@@ -254,8 +254,8 @@ uint32_t ulReturn, ulNewBASEPRI = configMAX_SYSCALL_INTERRUPT_PRIORITY;
 		section. */
 		mrs ulReturn, basepri
 		msr basepri, ulNewBASEPRI
-		dsb
-		isb
+		dsb//比ISB弱，只仅当所有在它前面的存储器访问操作都执行完毕后，才执行在它后面的指令	
+		isb//清洗流水线
 	}
 
 	return ulReturn;

@@ -20,12 +20,15 @@ static void vTaskLED(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
 static void AppTaskCreate(void);
-static void Overflowtest(void);
+static void AppObjCreate(void);
+static void vTimerCallback(xTimerHandle pxTimer);
+
 
 static TaskHandle_t xHandleTaskUserIF = NULL;
 static TaskHandle_t xHandleTaskLED = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
+static TimerHandle_t xTimers[2] = {NULL};
 
 
 
@@ -38,6 +41,7 @@ int main(void)
 	
 	vSetupSysInfoTest();//为了检测系统任务信息，时钟精度要高于系统节拍
 	AppTaskCreate();
+	AppObjCreate();		/* 创建任务通信机制 */
 	vTaskStartScheduler();
 	while(1);
 	
@@ -52,28 +56,51 @@ static void vTaskTaskUserIF(void *pvParameters)
 	{
 
 		printf("=================================================\r\n");
-
+	 
 		vTaskDelay(4000);
 		
 	}
 }
+
 static void vTaskLED(void *pvParameters)
 {
 	while(1)
 	{
-		macLED2_TOGGLE(); 
-		vTaskDelay(400);
+
+		printf("=================================================\r\n");
+	 
+		vTaskDelay(4000);
+		
 	}
-}
+//	TickType_t xLastWakeTime;
+//	const TickType_t xFrequency = 200;
+
+//	/* 获取当前的系统时间 */
+//    xLastWakeTime = xTaskGetTickCount();
+//	
+//    while(1)
+//    {
+//		macLED1_OFF();
+//		
+//		/* vTaskDelayUntil是绝对延迟，vTaskDelay是相对延迟。*/
+//        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+    }
+
 static void vTaskMsgPro(void *pvParameters)
 {
-		while(1)
-	{
-		macLED1_ON ();	
-		vTaskDelay(400);
-		macLED1_OFF ();
-		vTaskDelay(400);
-	}
+	TickType_t xLastWakeTime;
+	const TickType_t xFrequency = 200;
+
+	/* 获取当前的系统时间 */
+    xLastWakeTime = xTaskGetTickCount();
+	
+    while(1)
+    {
+		macLED2_TOGGLE();
+	
+		/* vTaskDelayUntil是绝对延迟，vTaskDelay是相对延迟。*/
+     vTaskDelayUntil(&xLastWakeTime, xFrequency);
+    }
 }
  static void vTaskStart(void *pvParameters)
 {
@@ -112,34 +139,17 @@ static void vTaskMsgPro(void *pvParameters)
 							USART1_printf(USART1, "\r\n ("__DATE__ " - " __TIME__ ") \r\n");
 					break;
 
-				case 0x10:			 
-					printf("gg overflow\r\n");
-					Overflowtest();
-					break;
-				/* 其他的键值不处理 */
+
 				default:   
 					printf("%x\r\n",ucKeyCode);                  
 					break;
 			}
 		}
 		
-		vTaskDelay(200) ;
+		vTaskDelay(20) ;
 	}
 } 
-static void Overflowtest(void)
-{
-	int16_t i;
-	uint8_t buf[2048];
-	for(i=2047;i>=0;i--)
-	{
-		buf[i]=0x55;
-		vTaskDelay(1);
-	}
-}
-void vApplicationStackOverflowHook( TaskHandle_t xTask, signed char *pcTaskName )
-{
-	printf("%s overflow \r\n", pcTaskName);
-}
+
 static void AppTaskCreate(void)
 {
 	xTaskCreate(vTaskTaskUserIF,
@@ -171,7 +181,79 @@ static void AppTaskCreate(void)
 				&xHandleTaskStart
 				); 
 }
+/*
+*********************************************************************************************************
+*	函 数 名: AppObjCreate
+*	功能说明: 创建任务通信机制
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void AppObjCreate (void)
+{
+	uint8_t i;
+	const TickType_t  xTimerPer[2] = {20000, 10000};
+	
+	/* 
+	  1. 创建定时器，如果在RTOS调度开始前初始化定时器，那么系统启动后才会执行。
+	  2. 统一初始化两个定时器，他们使用共同的回调函数，在回调函数中通过定时器ID来区分
+	     是那个定时器的时间到。当然，使用不同的回调函数也是没问题的。
+	*/
+	for(i = 0; i < 2; i++)
+	{
+		xTimers[i] = xTimerCreate("Timer",          /* 定时器名字 */
+							       xTimerPer[i],    /* 定时器周期,单位时钟节拍 */
+							       pdTRUE,          /* 周期性 */
+							       (void *) i,      /* 定时器ID */
+							       vTimerCallback); /* 定时器回调函数 */
 
+		if(xTimers[i] == NULL)
+		{
+			/* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
+		}
+		else
+		{
+			 /* 启动定时器，系统启动后才开始工作 */
+			 if(xTimerStart(xTimers[i], 100) != pdPASS)
+			 {
+				 /* 定时器还没有进入激活状态 */
+			 }
+		}
+	}
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: vTimerCallback
+*	功能说明: 定时器回调函数
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void vTimerCallback(xTimerHandle pxTimer)
+{
+	uint32_t ulTimerID;
+
+	configASSERT(pxTimer);
+
+	/* 获取那个定时器时间到 */
+	ulTimerID = (uint32_t)pvTimerGetTimerID(pxTimer);
+	
+	/* 处理定时器0任务 */
+	if(ulTimerID == 0)
+	{
+		macLED1_ON(); 
+	printf("0000000000\r\n");
+	}
+	
+	/* 处理定时器1任务 */
+	if(ulTimerID == 1)
+	{
+		macLED1_OFF(); 
+		printf("1111111111\r\n");
+		
+	}
+}
 
 
 /*********************************************END OF FILE**********************/
