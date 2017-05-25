@@ -9,19 +9,19 @@
  
 /****************************** LED 引脚配置参数定义***************************************/
 #define             macLED1_GPIO_APBxClock_FUN              RCC_APB2PeriphClockCmd
-#define             macLED1_GPIO_CLK                        RCC_APB2Periph_GPIOC
-#define             macLED1_GPIO_PORT                       GPIOC
-#define             macLED1_GPIO_PIN                        GPIO_Pin_3
+#define             macLED1_GPIO_CLK                        RCC_APB2Periph_GPIOB
+#define             macLED1_GPIO_PORT                       GPIOB
+#define             macLED1_GPIO_PIN                        GPIO_Pin_0
 
 #define             macLED2_GPIO_APBxClock_FUN              RCC_APB2PeriphClockCmd
-#define             macLED2_GPIO_CLK                        RCC_APB2Periph_GPIOC
-#define             macLED2_GPIO_PORT                       GPIOC
-#define             macLED2_GPIO_PIN                        GPIO_Pin_4
+#define             macLED2_GPIO_CLK                        RCC_APB2Periph_GPIOF
+#define             macLED2_GPIO_PORT                       GPIOF
+#define             macLED2_GPIO_PIN                        GPIO_Pin_7
 
 #define             macLED3_GPIO_APBxClock_FUN              RCC_APB2PeriphClockCmd
-#define             macLED3_GPIO_CLK                        RCC_APB2Periph_GPIOC
-#define             macLED3_GPIO_PORT                       GPIOB
-#define             macLED3_GPIO_PIN                        GPIO_Pin_0
+#define             macLED3_GPIO_CLK                        RCC_APB2Periph_GPIOF
+#define             macLED3_GPIO_PORT                       GPIOF
+#define             macLED3_GPIO_PIN                        GPIO_Pin_8
 
 
 
